@@ -5,8 +5,7 @@ import { Task, useTaskStore } from "@/store";
 import React, { useState } from "react";
 
 function AllTasks() {
-	const [allTasks, setAllTasks] = useState<Task[]>(mockTasks);
-	const addTask = useTaskStore((state) => state.addTask);
+	const { addTask, tasks } = useTaskStore();
 
 	const onDelete = (id: string) => {
 		setAllTasks((prev) => prev.filter((task) => task.id !== id));
@@ -14,7 +13,7 @@ function AllTasks() {
 
 	return (
 		<div className="space-y-4">
-			{allTasks.map((task) => (
+			{alslTasks.map((task) => (
 				<TaskCard key={task.id} task={task} onDelete={onDelete} />
 			))}
 		</div>
