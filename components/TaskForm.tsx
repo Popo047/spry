@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useTaskStore } from "@/store";
+import { useEffect, useState } from "react";
+import { Task } from "@/store";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,14 +18,33 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 
-export default function TaskForm() {
-	const addTask = useTaskStore((state) => state.addTask);
+interface TaskFormProps {
+	children: React.ReactElement;
+	task?: Task;
+	onSubmit: (data: {
+		title: string;
+		description: string;
+		dueDate: string;
+	}) => void;
+}
+
+export default function TaskForm({ children, task, onSubmit }: TaskFormProps) {
+	const isEditing = !!task;
 
 	const [open, setOpen] = useState(false);
 	const [title, setTitle] = useState("");
+	const [description, setDescription] = useState("");
 	const [dueDate, setDueDate] = useState<Date | undefined>();
 	const [error, setError] = useState("");
+
+	const resetForm = () => {
+		setTitle("");
+		setDescription("");
+		setDueDate(undefined);
+		setError("");
+	};
 
 	const handleSubmit = () => {
 		if (!title.trim()) {
@@ -38,60 +57,71 @@ export default function TaskForm() {
 			return;
 		}
 
-		addTask(title, dueDate.toISOString());
-		setTitle("");
-		setDueDate(undefined);
-		setError("");
+		onSubmit({
+			title,
+			description,
+			dueDate: dueDate.toISOString(),
+		});
+
+		resetForm();
 		setOpen(false);
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger asChild className="cursor-pointer">
-				<Button>+ Add Task</Button>
-			</DialogTrigger>
+		<Dialog
+			open={open}
+			onOpenChange={(val) => {
+				setOpen(val);
+				if (!val) resetForm();
+			}}
+		>
+			<DialogTrigger asChild>{children}</DialogTrigger>
 
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Create New Task</DialogTitle>
+					<DialogTitle>
+						{isEditing ? "Edit Task" : "Create New Task"}
+					</DialogTitle>
 				</DialogHeader>
 
 				<div className="space-y-4">
-					<div>
-						<Input
-							placeholder="Task title..."
-							value={title}
-							onChange={(e) => {
-								setTitle(e.target.value);
-								setError("");
-							}}
-						/>
-					</div>
+					<Input
+						placeholder="Task title..."
+						value={title}
+						onChange={(e) => {
+							setTitle(e.target.value);
+							setError("");
+						}}
+					/>
 
-					<div>
-						<Popover>
-							<PopoverTrigger asChild>
-								<Button variant="outline" className="w-full">
-									{dueDate ? dueDate.toDateString() : "Pick due date"}
-								</Button>
-							</PopoverTrigger>
-							<PopoverContent className="w-auto p-0">
-								<Calendar
-									mode="single"
-									selected={dueDate}
-									onSelect={(date) => {
-										setDueDate(date);
-										setError("");
-									}}
-								/>
-							</PopoverContent>
-						</Popover>
-					</div>
+					<Textarea
+						placeholder="Task description..."
+						value={description}
+						onChange={(e) => setDescription(e.target.value)}
+					/>
 
-					{error && <p className="text-sm text-red-500">{error}</p>}
+					<Popover>
+						<PopoverTrigger asChild>
+							<Button variant="outline" className="w-full">
+								{dueDate ? dueDate.toDateString() : "Pick due date"}
+							</Button>
+						</PopoverTrigger>
+						<PopoverContent className="w-auto p-0">
+							<Calendar
+								mode="single"
+								selected={dueDate}
+								onSelect={(date) => {
+									setDueDate(date);
+									setError("");
+								}}
+							/>
+						</PopoverContent>
+					</Popover>
 
-					<Button onClick={handleSubmit} className="w-full ">
-						Create Task
+					{error && <p className="text-sm text-destructive">{error}</p>}
+
+					<Button onClick={handleSubmit} className="w-full">
+						{isEditing ? "Update Task" : "Create Task"}
 					</Button>
 				</div>
 			</DialogContent>

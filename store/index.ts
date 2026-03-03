@@ -19,7 +19,13 @@ interface TaskStore {
 	addTask: (title: string, dueDate: string, description?: string) => void;
 	updateStatus: (id: string, status: TaskStatus) => void;
 	deleteTask: (id: string) => void;
-
+	updateTask: (
+		id: string,
+		title: string,
+		dueDate: string,
+		status: TaskStatus,
+		description?: string,
+	) => void;
 	pending: () => Task[];
 	inProgress: () => Task[];
 	completed: () => Task[];
@@ -52,6 +58,15 @@ export const useTaskStore = create<TaskStore>()(
 					),
 				})),
 
+			//for updating
+			updateTask: (id, title, dueDate, status, description) =>
+				set((state) => ({
+					tasks: state.tasks.map((task) =>
+						task.id === id
+							? { ...task, title, dueDate, description, status }
+							: task,
+					),
+				})),
 			deleteTask: (id) =>
 				set((state) => ({
 					tasks: state.tasks.filter((task) => task.id !== id),

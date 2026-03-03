@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useSearchParams, useRouter } from "next/navigation";
 import TaskForm from "@/components/TaskForm";
+import { Task, useTaskStore } from "@/store";
 
 function TasksLayout({
 	allTasks,
@@ -14,6 +15,8 @@ function TasksLayout({
 }) {
 	const searchParams = useSearchParams();
 	const router = useRouter();
+
+	const { addTask } = useTaskStore();
 
 	const tab = searchParams.get("tab") ?? "all";
 
@@ -26,7 +29,14 @@ function TasksLayout({
 			<div className="max-w-5xl mx-auto space-y-6">
 				<div className="flex justify-between">
 					<h1 className="text-3xl font-bold">Task Manager</h1>
-					<TaskForm />
+					<TaskForm
+						onSubmit={(data) => {
+							const { title, dueDate, description } = data;
+							addTask(title, dueDate, description);
+						}}
+					>
+						<Button>+ Add Task</Button>
+					</TaskForm>
 				</div>
 
 				<Tabs value={tab} onValueChange={handleChange}>
