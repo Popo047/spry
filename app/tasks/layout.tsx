@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTaskStore, Task } from "@/store";
+import { useTaskStore } from "@/store";
 
 import TaskControls, {
 	StatusFilter,
@@ -11,11 +11,11 @@ import TaskControls, {
 import TaskList from "@/components/TaskLists";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { SummaryCard } from "@/components/SummaryCard";
+import TaskForm from "@/components/TaskForm";
+import { Button } from "@/components/ui/button";
 
 export default function TasksLayout() {
-	const tasks = useTaskStore((state) => state.tasks);
-	const deleteTask = useTaskStore((state) => state.deleteTask);
-	const updateTask = useTaskStore((state) => state.updateTask);
+	const { tasks, addTask, deleteTask, updateStatus } = useTaskStore();
 
 	const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
@@ -43,7 +43,17 @@ export default function TasksLayout() {
 	return (
 		<div className="min-h-screen p-8">
 			<div className="max-w-5xl mx-auto space-y-6">
-				<h1 className="text-3xl font-bold">Task Manager</h1>
+				<div className="flex justify-between">
+					<h1 className="text-3xl font-bold">Task Manager</h1>
+					<TaskForm
+						onSubmit={(data) => {
+							const { title, dueDate, description } = data;
+							addTask(title, dueDate, description);
+						}}
+					>
+						<Button>+ Add Task</Button>
+					</TaskForm>
+				</div>
 
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 					<SummaryCard label="Total" value={total} />
