@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Calendar } from "lucide-react";
 import { format, parseISO } from "date-fns";
-import { Task, TaskStatus } from "@/store";
+import { Task, TaskStatus, useTaskStore } from "@/store";
 import TaskForm from "./TaskForm";
 
 interface TaskCardProps {
@@ -26,6 +26,8 @@ const statusRender: Record<TaskStatus, string> = {
 };
 
 export function TaskCard({ task, onDelete }: TaskCardProps) {
+	const { updateTask } = useTaskStore();
+
 	return (
 		<Card>
 			<CardHeader className="flex flex-row items-start justify-between gap-2">
@@ -39,7 +41,8 @@ export function TaskCard({ task, onDelete }: TaskCardProps) {
 					<TaskForm
 						task={task}
 						onSubmit={(updatedData) => {
-							console.log(updatedData);
+							const { description, dueDate, status, title, id } = updatedData;
+							updateTask(id!, title, dueDate, status, description);
 						}}
 					>
 						<Button variant="ghost" size="icon">

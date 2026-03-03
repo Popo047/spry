@@ -1,19 +1,17 @@
 "use client";
 import { TaskCard } from "@/components/TaskCard";
-import { mockTasks } from "@/mock/tasks";
-import { Task, useTaskStore } from "@/store";
-import React, { useState } from "react";
+import { useTaskStore } from "@/store";
 
 function AllTasks() {
-	const { addTask, tasks } = useTaskStore();
+	const { tasks, deleteTask } = useTaskStore();
 
 	const onDelete = (id: string) => {
-		setAllTasks((prev) => prev.filter((task) => task.id !== id));
+		deleteTask(id);
 	};
 
 	return (
 		<div className="space-y-4">
-			{alslTasks.map((task) => (
+			{tasks.map((task) => (
 				<TaskCard key={task.id} task={task} onDelete={onDelete} />
 			))}
 		</div>

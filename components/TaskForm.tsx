@@ -35,6 +35,7 @@ interface TaskFormProps {
 		description: string;
 		dueDate: string;
 		status: Task["status"];
+		id?: string;
 	}) => void;
 }
 
@@ -71,6 +72,7 @@ export default function TaskForm({ children, task, onSubmit }: TaskFormProps) {
 			description,
 			dueDate: dueDate.toISOString(),
 			status,
+			id: isEditing ? task.id : undefined,
 		});
 
 		resetForm();

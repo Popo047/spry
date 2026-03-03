@@ -17,7 +17,7 @@ function TasksLayout({
 	const searchParams = useSearchParams();
 	const router = useRouter();
 
-	const { addTask, tasks, completed } = useTaskStore();
+	const { addTask, tasks } = useTaskStore();
 
 	const tab = searchParams.get("tab") ?? "all";
 
