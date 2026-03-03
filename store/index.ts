@@ -7,14 +7,16 @@ export type TaskStatus = "pending" | "in_progress" | "completed";
 export interface Task {
 	id: string;
 	title: string;
+	description?: string;
 	status: TaskStatus;
 	createdAt: number;
+	dueDate: string;
 }
 
 interface TaskStore {
 	tasks: Task[];
 
-	addTask: (title: string) => void;
+	addTask: (title: string, dueDate: string, description?: string) => void;
 	updateStatus: (id: string, status: TaskStatus) => void;
 	deleteTask: (id: string) => void;
 
@@ -28,7 +30,7 @@ export const useTaskStore = create<TaskStore>()(
 		(set, get) => ({
 			tasks: [],
 
-			addTask: (title) =>
+			addTask: (title, dueDate, description) =>
 				set((state) => ({
 					tasks: [
 						...state.tasks,
@@ -37,6 +39,8 @@ export const useTaskStore = create<TaskStore>()(
 							title,
 							status: "pending",
 							createdAt: Date.now(),
+							dueDate,
+							description: description ? description : "",
 						},
 					],
 				})),
