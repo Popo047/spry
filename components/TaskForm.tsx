@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
@@ -19,7 +20,13 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 interface TaskFormProps {
 	children: React.ReactElement;
 	task?: Task;
@@ -27,6 +34,7 @@ interface TaskFormProps {
 		title: string;
 		description: string;
 		dueDate: string;
+		status: Task["status"];
 	}) => void;
 }
 
@@ -38,11 +46,12 @@ export default function TaskForm({ children, task, onSubmit }: TaskFormProps) {
 	const [description, setDescription] = useState("");
 	const [dueDate, setDueDate] = useState<Date | undefined>();
 	const [error, setError] = useState("");
-
+	const [status, setStatus] = useState<Task["status"]>("pending");
 	const resetForm = () => {
 		setTitle("");
 		setDescription("");
 		setDueDate(undefined);
+		setStatus("pending");
 		setError("");
 	};
 
@@ -61,6 +70,7 @@ export default function TaskForm({ children, task, onSubmit }: TaskFormProps) {
 			title,
 			description,
 			dueDate: dueDate.toISOString(),
+			status,
 		});
 
 		resetForm();
@@ -72,12 +82,25 @@ export default function TaskForm({ children, task, onSubmit }: TaskFormProps) {
 			open={open}
 			onOpenChange={(val) => {
 				setOpen(val);
-				if (!val) resetForm();
+
+				if (val) {
+					if (task) {
+						setTitle(task.title);
+						setDescription(task.description || "");
+						setDueDate(task.dueDate ? new Date(task.dueDate) : undefined);
+						setStatus(task.status);
+					} else {
+						resetForm();
+					}
+				} else {
+					resetForm();
+				}
 			}}
 		>
 			<DialogTrigger asChild>{children}</DialogTrigger>
 
 			<DialogContent>
+				<DialogDescription></DialogDescription>
 				<DialogHeader>
 					<DialogTitle>
 						{isEditing ? "Edit Task" : "Create New Task"}
@@ -99,7 +122,19 @@ export default function TaskForm({ children, task, onSubmit }: TaskFormProps) {
 						value={description}
 						onChange={(e) => setDescription(e.target.value)}
 					/>
-
+					<Select
+						value={status}
+						onValueChange={(val) => setStatus(val as Task["status"])}
+					>
+						<SelectTrigger className="w-full">
+							<SelectValue placeholder="Select status" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="pending">Pending</SelectItem>
+							<SelectItem value="in_progress">In Progress</SelectItem>
+							<SelectItem value="completed">Completed</SelectItem>
+						</SelectContent>
+					</Select>
 					<Popover>
 						<PopoverTrigger asChild>
 							<Button variant="outline" className="w-full">
